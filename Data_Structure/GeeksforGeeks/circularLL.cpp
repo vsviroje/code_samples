@@ -48,6 +48,19 @@
         2. Search for the node after which T needs to be inserted, say that node is P. 
         3. Make T -> next = P -> next; 
         4. P -> next = T.
+    Delete that node from the circular linked list.
+        Algorithm
+        Case 1: List is empty. 
+            If the list is empty we will simply return.
+        Case 2:List is not empty  
+            If the list is not empty then we define two pointers curr and prev and initialize the pointer curr with the head node.
+            Traverse the list using curr to find the node to be deleted and before moving to curr to the next node, every time set prev = curr.
+            If the node is found, check if it is the only node in the list. If yes, set head = NULL and free(curr).
+            If the list has more than one node, check if it is the first node of the list. Condition to check this( curr == head). If yes, then move prev until it reaches the last node. After prev reaches the last node, set head = head -> next and prev -> next = head. Delete curr.
+            If curr is not the first node, we check if it is the last node in the list. Condition to check this is (curr -> next == head).
+            If curr is the last node. Set prev -> next = head and delete the node curr by free(curr).
+            If the node to be deleted is neither the first node nor the last node, then set prev -> next = curr -> next and delete curr.
+
 */
 
 #include<bits/stdc++.h>
@@ -65,6 +78,8 @@ int main(){
     Node* InsertAtBeginningLL(Node* ,int );
     Node* InsertAtEndLL(Node*,int);
     Node* InsertAtAfterLL(Node*,int,int);
+    Node* DeleteNodeLL(Node*,int);
+    int CountNode(Node*);
 
     void PrintNode(Node* );
 
@@ -73,12 +88,22 @@ int main(){
     lastNode=InsertToEmptyLL(lastNode,1);
     lastNode=InsertAtBeginningLL(lastNode,2);
     lastNode=InsertAtEndLL(lastNode,3);
-    
-    PrintNode(lastNode->next);
-
     lastNode=InsertAtAfterLL(lastNode,4,3);
+    lastNode=InsertAtEndLL(lastNode,5);
+    lastNode=InsertAtEndLL(lastNode,6);
+    lastNode=InsertAtEndLL(lastNode,7);
+
+    PrintNode(lastNode->next);   
+    lastNode=DeleteNodeLL(lastNode,7);
     PrintNode(lastNode->next);
 
+    lastNode=DeleteNodeLL(lastNode,2);
+    PrintNode(lastNode->next);
+
+    lastNode=DeleteNodeLL(lastNode,5);
+    PrintNode(lastNode->next);
+    CountNode(lastNode->next);
+    
     return 0;
 }
 
@@ -183,4 +208,77 @@ Node* InsertAtAfterLL(Node* lastNode,int data,int afterData){
     } while(list!=lastNode->next);
 
     return lastNode;
+}
+
+Node* DeleteNodeLL(Node* lastNode,int deleteData){
+
+    if(lastNode==NULL){
+        return NULL;
+    }
+    
+    Node* head=lastNode->next;    
+    Node* curr=head;
+    Node* prev=NULL;
+    Node* deleteNode=NULL;
+
+    do{
+        
+        if(curr->data==deleteData){
+            deleteNode=curr;
+            
+            if(curr->next==curr){//only one node
+                lastNode=NULL;
+            }else if(curr==head){
+                lastNode->next=head->next;
+            }else if(curr==lastNode){
+                lastNode=prev;
+                lastNode->next=head;
+            }else{
+                prev->next=curr->next;
+            }
+
+            delete deleteNode;
+            break;
+        }
+
+        prev=curr;
+        curr=curr->next;
+
+    }while(curr!=head);
+
+
+    return lastNode;
+}
+
+bool IsLLCircular(Node* temp){
+    unordered_set<Node*> map;
+    while(temp!=NULL){
+        if(map.find(temp) != map.end()){
+            return true;
+        }
+        map.insert(temp);
+        temp=temp->next;
+    }
+    return false;
+}
+
+int CountNode(Node* head){
+    
+    if(head==NULL){
+        return 0;
+    }
+    int counter=0;
+
+    Node* temp=head;
+   
+    do{
+        
+        temp=temp->next;
+        counter++;
+
+    }while(temp!=head);
+
+    cout<<"Count:"<<counter<<endl;
+    
+    return counter;
 }
